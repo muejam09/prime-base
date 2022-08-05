@@ -1,6 +1,8 @@
 import Router from "koa-router";
 import { Logger } from "../util/logging";
+import {UdpQuantumX} from "../services/udpReceiver";
 
+const receiver = new UdpQuantumX();
 const router = new Router();
 const BASE_URL = "/api/v1";
 
@@ -11,7 +13,7 @@ router.get(BASE_URL, async (ctx) => {
 
 router.get(BASE_URL + "/test", async (ctx) => {
     try {
-        ctx.body = { msg: "Hello world test!" };
+        ctx.body = { data: receiver.data };
         if (ctx.body == null) {
             throw {
                 code: 500,
