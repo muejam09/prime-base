@@ -6,6 +6,6 @@ export interface QuantumXData {
     channel1: number;
     channel2: number;
     laser: number;
-    us1:number;
-    us2:number;
+    ush:number;
+    usv:number;
 }

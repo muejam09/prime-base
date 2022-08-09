@@ -11,13 +11,13 @@ router.get(BASE_URL, async (ctx) => {
     ctx.status = 200;
 });
 
-router.get(BASE_URL + "/test", async (ctx) => {
+router.get(BASE_URL + "/quantumx", async (ctx) => {
     try {
-        ctx.body = { data: receiver.data };
+        ctx.body = receiver.data ;
         if (ctx.body == null) {
             throw {
                 code: 500,
-                message: "Internal Server Error - Leica not Reachable",
+                message: "Internal Server Error - QuantumX not Reachable",
             };
         }
     } catch (err: any) {

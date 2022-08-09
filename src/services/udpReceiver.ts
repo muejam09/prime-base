@@ -1,7 +1,6 @@
 import * as dgram from "node:dgram";
 import {AddressInfo} from "net";
 import {Logger} from "../util/logging";
-import * as buffer from "buffer";
 import {QuantumXData} from "../types/QuantumXData";
 
 export class UdpQuantumX {
@@ -17,7 +16,7 @@ export class UdpQuantumX {
             Logger.log("UDP Server listening on " + address.address + ":" + address.port + " for QuantumX Packages!");
         });
 
-        server.on("message", (message: Buffer, remote: any) => {
+        server.on("message", (message: Buffer) => {
             // Logger.log("udp message received");
             try {
                 // Logger.log(message.toString('hex'));
@@ -41,7 +40,7 @@ export class UdpQuantumX {
     }
 
     public hexMsgToQuantumXData(msg: Buffer): QuantumXData {
-        const data: QuantumXData = {
+        return {
             id: msg.toString('utf8', 0, 2),
             numberofChannel: msg.readInt16LE(2),// kanalanzahl
             pkgCnt: msg.readInt32LE(5),
@@ -49,10 +48,9 @@ export class UdpQuantumX {
             channel1: msg.readDoubleLE(16),
             channel2: msg.readDoubleLE(24),
             laser: msg.readDoubleLE(32),
-            us1:msg.readDoubleLE(40),
-            us2:msg.readDoubleLE(48),
+            ush: msg.readDoubleLE(40),
+            usv: msg.readDoubleLE(48),
         };
-        return data;
     }
 
     get data(): QuantumXData | undefined {
