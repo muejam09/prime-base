@@ -5,7 +5,9 @@ export interface QuantumXData {
     time: number;
     channel1: number;
     channel2: number;
+    force:number;
     laser: number;
     ush:number;
     usv:number;
+    periodDet: number;
 }

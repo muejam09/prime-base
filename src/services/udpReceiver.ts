@@ -47,9 +47,11 @@ export class UdpQuantumX {
             time: msg.readDoubleLE(8),
             channel1: msg.readDoubleLE(16),
             channel2: msg.readDoubleLE(24),
-            laser: msg.readDoubleLE(32),
-            ush: msg.readDoubleLE(40),
-            usv: msg.readDoubleLE(48),
+            force: msg.readDoubleLE(32),
+            laser: msg.readDoubleLE(40),
+            ush: msg.readDoubleLE(48),
+            usv: msg.readDoubleLE(56),
+            periodDet: msg.readDoubleLE(64),
         };
     }
 
