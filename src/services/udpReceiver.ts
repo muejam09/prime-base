@@ -29,7 +29,7 @@ export class UdpQuantumX {
                 // Logger.log(message.readDoubleLE(32)) // kanal Laser
                 // Logger.log(message.readDoubleLE(40)) // kanal US 1
                 // Logger.log(message.readDoubleLE(48)) // kanal US 2
-                this.hexMsgToQuantumXData(message);
+                // this.hexMsgToQuantumXData(message);
                 this._data = this.hexMsgToQuantumXData(message);
             } catch (e) {
                 Logger.log(e, "ERROR");
@@ -40,7 +40,7 @@ export class UdpQuantumX {
     }
 
     public hexMsgToQuantumXData(msg: Buffer): QuantumXData {
-        return {
+        const data: QuantumXData = {
             id: msg.toString('utf8', 0, 2),
             numberofChannel: msg.readInt16LE(2),// kanalanzahl
             pkgCnt: msg.readInt32LE(5),
@@ -52,7 +52,20 @@ export class UdpQuantumX {
             ush: msg.readDoubleLE(48),
             usv: msg.readDoubleLE(56),
             periodDet: msg.readDoubleLE(64),
+            rpmSignal: msg.readDoubleLE(72)
+        }
+        this.quantumXDataToUiData(data)
+        return data;
+    }
+
+    public quantumXDataToUiData(data: QuantumXData): any {
+        const newData: any = {
+            ush: data.ush,
+            usv: data.usv,
+            rpm: data.rpmSignal,
         };
+        console.log(newData)
+        return null;
     }
 
     get data(): QuantumXData | undefined {
