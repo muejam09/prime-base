@@ -11,4 +11,7 @@ export interface QuantumXData {
     usv:number;
     periodDet: number;
     rpmSignal: number;
+    cnt: number;
+    cnt2: number;
+    cnt3: number;
 }

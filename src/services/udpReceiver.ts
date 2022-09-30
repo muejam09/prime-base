@@ -2,13 +2,32 @@ import * as dgram from "node:dgram";
 import {AddressInfo} from "net";
 import {Logger} from "../util/logging";
 import {QuantumXData} from "../types/QuantumXData";
+import {BehaviorSubject, bufferTime, distinct, distinctUntilChanged, map, tap} from "rxjs";
+import {UiData} from "../types/UiData";
+
 
 export class UdpQuantumX {
-    private _data: QuantumXData | undefined;
+    private _data: UiData | undefined;
+    private cnterSubject: BehaviorSubject<number>;
+    private rpm: number = 0;
 
     constructor() {
         const PORT = 12001;
         const server = dgram.createSocket("udp4");
+        this.cnterSubject = new BehaviorSubject<number>(0);
+
+        // rpm calculation via rxjs
+        const timeToMeasureRpm = 10; // in seconds
+        this.cnterSubject.pipe(
+            // tap(value => console.log('got new value')),
+            distinctUntilChanged(),
+            // tap(value => console.log('after distinct')),
+            bufferTime(timeToMeasureRpm*1000), // wait for x seconds
+            map(cnts => {
+                return timeToMeasureRpm*60 / cnts.length;
+            }),
+            tap(value => console.log(value))
+        ).subscribe(value => this.rpm=value);
 
 
         server.on("listening", () => {
@@ -30,7 +49,7 @@ export class UdpQuantumX {
                 // Logger.log(message.readDoubleLE(40)) // kanal US 1
                 // Logger.log(message.readDoubleLE(48)) // kanal US 2
                 // this.hexMsgToQuantumXData(message);
-                this._data = this.hexMsgToQuantumXData(message);
+                this._data = this.hexMsgToUiXData(message);
             } catch (e) {
                 Logger.log(e, "ERROR");
             }
@@ -39,36 +58,56 @@ export class UdpQuantumX {
         server.bind(PORT);
     }
 
-    public hexMsgToQuantumXData(msg: Buffer): QuantumXData {
-        const data: QuantumXData = {
-            id: msg.toString('utf8', 0, 2),
-            numberofChannel: msg.readInt16LE(2),// kanalanzahl
-            pkgCnt: msg.readInt32LE(5),
-            time: msg.readDoubleLE(8),
-            channel1: msg.readDoubleLE(16),
-            channel2: msg.readDoubleLE(24),
-            force: msg.readDoubleLE(32),
-            laser: msg.readDoubleLE(40),
-            ush: msg.readDoubleLE(48),
-            usv: msg.readDoubleLE(56),
-            periodDet: msg.readDoubleLE(64),
-            rpmSignal: msg.readDoubleLE(72)
+    public hexMsgToUiXData(msg: Buffer): UiData {
+        if (false) // TODO add check for channels size to support scrapetec quantumx
+        {
+            const data: any = {
+                id: msg.toString('utf8', 0, 2),
+                numberofChannel: msg.readInt16LE(2),// kanalanzahl
+                pkgCnt: msg.readInt32LE(5),
+                time: msg.readDoubleLE(8),
+                channel1: msg.readDoubleLE(16),
+                channel2: msg.readDoubleLE(24),
+                ush: msg.readDoubleLE(48),
+                usv: msg.readDoubleLE(56),
+                rpmSignal: msg.readDoubleLE(72)
+            }
+            return data;
+        } else {
+            const data: QuantumXData = {
+                id: msg.toString('utf8', 0, 2),
+                numberofChannel: msg.readInt16LE(2), // kanalanzahl
+                pkgCnt: msg.readUInt16LE(5),
+                time: msg.readDoubleLE(8),
+                channel1: msg.readDoubleLE(16),
+                channel2: msg.readDoubleLE(24),
+                force: msg.readDoubleLE(32),
+                laser: msg.readDoubleLE(40),
+                ush: msg.readDoubleLE(48),
+                usv: msg.readDoubleLE(56),
+                periodDet: msg.readDoubleLE(64),
+                rpmSignal: msg.readDoubleLE(72),
+                cnt: msg.readDoubleLE(80),
+                cnt2: msg.readDoubleLE(88),
+                cnt3: msg.readDoubleLE(96)
+            }
+            // rpm calculation via rxjs
+            this.cnterSubject.next(data.cnt3);
+            // conversion to data for ui
+            return this.quantumXDataToUiData(data);
         }
-        this.quantumXDataToUiData(data)
-        return data;
     }
 
     public quantumXDataToUiData(data: QuantumXData): any {
-        const newData: any = {
+        const newData: UiData = {
             ush: data.ush,
             usv: data.usv,
-            rpm: data.rpmSignal,
+            rpm: this.rpm,
         };
-        console.log(newData)
-        return null;
+        return newData;
     }
 
-    get data(): QuantumXData | undefined {
+    get data(): UiData | undefined {
         return this._data;
     }
 }

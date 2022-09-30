@@ -11,7 +11,8 @@
     "build-ts": "tsc",
     "build": "rimraf dist && npm run build-ts",
     "start": "npm run serve",
-    "build-and-serve": "npm run build && npm run serve"
+    "build-and-serve": "npm run build && npm run serve",
+    "sim-quantumx": "ts-node src/simulation/QuantumXUdpClient.ts"
   },
   "keywords": [],
   "author": "Jakob Müller",
@@ -24,7 +25,8 @@
     "koa-json": "^2.0.2",
     "koa-logger": "^3.2.1",
     "koa-router": "^12.0.0",
-    "koa-static": "^5.0.0"
+    "koa-static": "^5.0.0",
+    "rxjs": "^7.5.7"
   },
   "devDependencies": {
     "@types/koa": "^2.13.5",
