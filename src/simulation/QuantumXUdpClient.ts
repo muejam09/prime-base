@@ -29,16 +29,16 @@ function sendLoop() {
             header +
             timechannel + // timechannel
             dummychannel + // channel 2
-            dummychannel + //channel 1
-            dummychannel + //force
-            dummychannel + //laser
-            dummychannel + //ush
-            dummychannel + //usv
-            dummychannel + //periodeDet
-            dummychannel + //rpmSignal
-            dummychannel + //cnt1
-            dummychannel + //cnt2
-            dummychannel; //cnt3
+            dummychannel + // channel 1
+            dummychannel + // force
+            dummychannel + // laser
+            dummychannel + // ush
+            dummychannel + // usv
+            dummychannel + // periodeDet
+            dummychannel + // rpmSignal
+            dummychannel + // cnt1
+            dummychannel + // cnt2
+            dummychannel; // cnt3
         const message = new Buffer(complete, 'hex');
         // console.log(message.toString('utf8', 0, 2));
         // console.log(message.readInt16LE(2));
@@ -48,7 +48,7 @@ function sendLoop() {
         message.writeDoubleLE(usv, 56);
         message.writeDoubleLE(cnt, 96);
         // console.log(message.readDoubleLE(96));
-        client.send(message, 0, message.length, PORT, HOST, (err, bytes) => {
+        client.send(message, 0, message.length, PORT, HOST, (err) => {
             if (err) {
                 throw err;
             }
@@ -59,7 +59,6 @@ function sendLoop() {
 
         if (angle === 0 || angle === 90 || angle === 180 || angle === 270) {
             cnt++;// TODO add better rpm
-            console.log('new rpm' + cnt)
         }
         if (angle >= 360) // restart every minute
         {

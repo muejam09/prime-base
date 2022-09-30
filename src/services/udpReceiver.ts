@@ -2,7 +2,7 @@ import * as dgram from "node:dgram";
 import {AddressInfo} from "net";
 import {Logger} from "../util/logging";
 import {QuantumXData} from "../types/QuantumXData";
-import {BehaviorSubject, bufferTime, distinct, distinctUntilChanged, map, tap} from "rxjs";
+import {BehaviorSubject, bufferTime, distinctUntilChanged, map} from "rxjs";
 import {UiData} from "../types/UiData";
 
 
@@ -26,7 +26,7 @@ export class UdpQuantumX {
             map(cnts => {
                 return timeToMeasureRpm*60 / cnts.length;
             }),
-            tap(value => console.log(value))
+            // tap(value => console.log(value))
         ).subscribe(value => this.rpm=value);
 
 
@@ -99,12 +99,11 @@ export class UdpQuantumX {
     }
 
     public quantumXDataToUiData(data: QuantumXData): any {
-        const newData: UiData = {
+        return {
             ush: data.ush,
             usv: data.usv,
             rpm: this.rpm,
         };
-        return newData;
     }
 
     get data(): UiData | undefined {
