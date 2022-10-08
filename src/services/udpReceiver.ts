@@ -2,32 +2,34 @@ import * as dgram from "node:dgram";
 import {AddressInfo} from "net";
 import {Logger} from "../util/logging";
 import {QuantumXData} from "../types/QuantumXData";
-import {BehaviorSubject, bufferTime, distinctUntilChanged, map} from "rxjs";
+import {BehaviorSubject, bufferTime, distinctUntilChanged, filter, map, tap} from "rxjs";
 import {UiData} from "../types/UiData";
 
 
 export class UdpQuantumX {
     private _data: UiData | undefined;
-    private cnterSubject: BehaviorSubject<number>;
-    private rpm: number = 0;
+    private counterSubject: BehaviorSubject<number>;
+    private rpm: number = -1;
 
     constructor() {
         const PORT = 12001;
         const server = dgram.createSocket("udp4");
-        this.cnterSubject = new BehaviorSubject<number>(0);
+        this.counterSubject = new BehaviorSubject<number>(-1);
 
         // rpm calculation via rxjs
-        const timeToMeasureRpm = 10; // in seconds
-        this.cnterSubject.pipe(
+        const timeToMeasureRpm = 1; // in seconds
+        this.counterSubject.pipe(
             // tap(value => console.log('got new value')),
+            filter(value => value % 2 === 0),// only every even count, because sensor emits twice per magnet (falling and rising edge)
             distinctUntilChanged(),
-            // tap(value => console.log('after distinct')),
-            bufferTime(timeToMeasureRpm*1000), // wait for x seconds
+            // tap(value => console.log('after distinct with value: ' + value)),
+            bufferTime(timeToMeasureRpm * 1000), // wait for x seconds
             map(cnts => {
-                return timeToMeasureRpm*60 / cnts.length;
+                console.log('cnts registered in '+ timeToMeasureRpm + 's:' + cnts.length);
+                return cnts.length / timeToMeasureRpm * 60/4; // devide by 4 for 4 magnets
             }),
             // tap(value => console.log(value))
-        ).subscribe(value => this.rpm=value);
+        ).subscribe(value => this.rpm = value);
 
 
         server.on("listening", () => {
@@ -92,7 +94,7 @@ export class UdpQuantumX {
                 cnt3: msg.readDoubleLE(96)
             }
             // rpm calculation via rxjs
-            this.cnterSubject.next(data.cnt3);
+            this.counterSubject.next(data.cnt3);
             // conversion to data for ui
             return this.quantumXDataToUiData(data);
         }

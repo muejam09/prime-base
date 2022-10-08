@@ -64,9 +64,10 @@ function sendLoop() {
         {
             angle = 0;
         } else {
-            ush = 58.37965019175549 + (radius + Math.random()) * Math.sin(angle * (Math.PI / 180))
-            usv = 60.377945725829846 + (radius + Math.random()) * Math.cos(angle * (Math.PI / 180))
+            ush = 51.50 + (radius + Math.random()) * Math.sin(angle * (Math.PI / 180))
+            usv = 62.21 + (radius + Math.random()) * Math.cos(angle * (Math.PI / 180))
             angle += angleStep;
         }
+        cnt= 1200;
     }
 }
