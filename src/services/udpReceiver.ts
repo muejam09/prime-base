@@ -25,7 +25,7 @@ export class UdpQuantumX {
             // tap(value => console.log('after distinct with value: ' + value)),
             bufferTime(timeToMeasureRpm * 1000), // wait for x seconds
             map(cnts => {
-                console.log('cnts registered in '+ timeToMeasureRpm + 's:' + cnts.length);
+                // console.log('cnts registered in '+ timeToMeasureRpm + 's:' + cnts.length);
                 return cnts.length / timeToMeasureRpm * 60/4; // devide by 4 for 4 magnets
             }),
             // tap(value => console.log(value))

@@ -68,6 +68,6 @@ function sendLoop() {
             usv = 62.21 + (radius + Math.random()) * Math.cos(angle * (Math.PI / 180))
             angle += angleStep;
         }
-        cnt= 1200;
+        // cnt= 1200;
     }
 }

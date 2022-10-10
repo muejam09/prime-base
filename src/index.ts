@@ -1,38 +1,29 @@
 import Koa from "koa";
 import cors from "@koa/cors";
-
+import serve from "koa-static";
 import logger from "koa-logger";
 import json from "koa-json";
-
-import { router as uiRouter } from "./routes/index";
-import { router as resourceRouter } from "./routes/resources";
-import { Logger } from "./util/logging";
+import {router as resourceRouter} from "./routes/resources";
 
 const app = new Koa();
-// const router = new Router();
 
-// Middlewares
-// app.use(json());
-app.use(logger());
-
+const SPA_PATH = `${__dirname}\\public`
+const PORT = 3000;
 const options = {
     origin: "*", // TODO change me
 };
 
+// Middlewares
 app.use(cors(options));
+app.use(json()); // pretty json body in browser
+app.use(logger()); // log requests in console
 
-app.use(resourceRouter.routes())
-app.use(uiRouter.routes())
+app.use(serve(SPA_PATH, {defer: true})) // serve static SPA
+app.use(resourceRouter.routes());
 
-let server = app.listen(3000, () => {
-    console.log("Koa started");
+const server = app.listen(PORT, () => {
+    console.log("Koa started ");
 });
 
-export async function waitforServer(callback: any) {
-    server = await server;
-    Logger.log("Server loaded", "INFO");
-    callback();
-}
-
-export { server };
-export { app };
+export {server};
+export {app};
