@@ -26,7 +26,7 @@ export class UdpQuantumX {
             bufferTime(timeToMeasureRpm * 1000), // wait for x seconds
             map(cnts => {
                 // console.log('cnts registered in '+ timeToMeasureRpm + 's:' + cnts.length);
-                return cnts.length / timeToMeasureRpm * 60/4; // devide by 4 for 4 magnets
+                return cnts.length / timeToMeasureRpm * 60 / 4; // devide by 4 for 4 magnets
             }),
             // tap(value => console.log(value))
         ).subscribe(value => this.rpm = value);
@@ -61,43 +61,27 @@ export class UdpQuantumX {
     }
 
     public hexMsgToUiXData(msg: Buffer): UiData {
-        if (false) // TODO add check for channels size to support scrapetec quantumx
-        {
-            const data: any = {
-                id: msg.toString('utf8', 0, 2),
-                numberofChannel: msg.readInt16LE(2),// kanalanzahl
-                pkgCnt: msg.readInt32LE(5),
-                time: msg.readDoubleLE(8),
-                channel1: msg.readDoubleLE(16),
-                channel2: msg.readDoubleLE(24),
-                ush: msg.readDoubleLE(48),
-                usv: msg.readDoubleLE(56),
-                rpmSignal: msg.readDoubleLE(72)
-            }
-            return data;
-        } else {
-            const data: QuantumXData = {
-                id: msg.toString('utf8', 0, 2),
-                numberofChannel: msg.readInt16LE(2), // kanalanzahl
-                pkgCnt: msg.readUInt16LE(5),
-                time: msg.readDoubleLE(8),
-                channel1: msg.readDoubleLE(16),
-                channel2: msg.readDoubleLE(24),
-                force: msg.readDoubleLE(32),
-                laser: msg.readDoubleLE(40),
-                ush: msg.readDoubleLE(48),
-                usv: msg.readDoubleLE(56),
-                periodDet: msg.readDoubleLE(64),
-                rpmSignal: msg.readDoubleLE(72),
-                cnt: msg.readDoubleLE(80),
-                cnt2: msg.readDoubleLE(88),
-                cnt3: msg.readDoubleLE(96)
-            }
-            // rpm calculation via rxjs
-            this.counterSubject.next(data.cnt3);
-            // conversion to data for ui
-            return this.quantumXDataToUiData(data);
+        const data: QuantumXData = {
+            id: msg.toString('utf8', 0, 2),
+            numberofChannel: msg.readInt16LE(2), // kanalanzahl
+            pkgCnt: msg.readUInt16LE(5),
+            time: msg.readDoubleLE(8),
+            channel1: msg.readDoubleLE(16),
+            channel2: msg.readDoubleLE(24),
+            force: msg.readDoubleLE(32),
+            laser: msg.readDoubleLE(40),
+            ush: msg.readDoubleLE(48),
+            usv: msg.readDoubleLE(56),
+            periodDet: msg.readDoubleLE(64),
+            rpmSignal: msg.readDoubleLE(72),
+            cnt: msg.readDoubleLE(80),
+            cnt2: msg.readDoubleLE(88),
+            cnt3: msg.readDoubleLE(96)
         }
+        // rpm calculation via rxjs
+        this.counterSubject.next(data.cnt3);
+        // conversion to data for ui
+        return this.quantumXDataToUiData(data);
     }
 
     public quantumXDataToUiData(data: QuantumXData): any {
